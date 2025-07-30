@@ -92,10 +92,10 @@ const authenticateToken = async (req, res, next) => {
     const authData = await readAuthData();
     const session = authData.sessions[token];
     
-    // For the purpose of this challenge i am commenting this so it can be easily run in any machine without. generating new token // 
-    // if (!session || session.expiresAt < Date.now()) {
-    //   return res.status(403).json({ error: 'Invalid or expired token' });
-    // }
+    
+    if (!session || session.expiresAt < Date.now()) {
+      return res.status(403).json({ error: 'Invalid or expired token' });
+    }
 
     req.user = session.user;
     next();

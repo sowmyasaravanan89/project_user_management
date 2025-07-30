@@ -12,7 +12,8 @@ public class ConfigManager {
     
     private ConfigManager () throws IOException{
 
-        InputStream inputStream = ConfigManager.class.getResourceAsStream("../resource/config.properties");
+        InputStream inputStream = ConfigManager.class.getResourceAsStream("/config.properties");
+        System.out.println("Loading configuration from: " + inputStream);
         prop.load(inputStream);
     }
     
