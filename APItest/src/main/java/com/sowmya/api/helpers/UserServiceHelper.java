@@ -87,7 +87,7 @@ public class UserServiceHelper {
     }
 
     public Response getAllUsersResponse() {
-        return RestAssured.given().log().all()
+        return RestAssured.given()
                 .contentType(ContentType.JSON)
                 .header("Authorization","Bearer " + authToken)
                 .get(Endpoints.GET_ALL_USER);
@@ -126,7 +126,7 @@ public class UserServiceHelper {
                 .put(Endpoints.UPDATE_USER);
     }
 
-    public Response updateUser(String userId, Map<String ,  Object > userData) {
+    public Response updateUser(String userId, Map<String ,Object> userData) {
         return RestAssured.given()
                 .contentType(ContentType.JSON)
                 .header("Authorization", "Bearer " + authToken)
@@ -149,7 +149,7 @@ public class UserServiceHelper {
                 .contentType(ContentType.JSON)
                 .header("Authorization", "Bearer " + authToken)
                 .pathParam("id", userId)
-                .put(Endpoints.DELETE_USER);
+                .delete(Endpoints.DELETE_USER);
     }
 
 

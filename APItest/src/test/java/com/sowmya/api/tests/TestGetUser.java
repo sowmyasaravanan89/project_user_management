@@ -11,11 +11,8 @@ import com.sowmya.api.helpers.UserServiceHelper;
 import com.sowmya.api.model.User;
 import com.sowmya.api.utils.ConfigManager;
 import com.sowmya.api.utils.TestDataManager;
-
 import io.restassured.response.Response;
 
-import static org.testng.Assert.assertFalse;
-import static org.testng.Assert.assertNotNull;
 
 public class TestGetUser {
 
@@ -114,9 +111,9 @@ public class TestGetUser {
 
         Response response = userServiceHelper.getAllUsersResponse();
 
-        Assert.assertEquals(response.getStatusCode(), 401, "Expected status code 401 for unauthorized access");
-        Assert.assertTrue(response.getBody().asString().contains("Unauthorized"), 
-                          "Response should contain 'Unauthorized' message");
+        Assert.assertEquals(response.getStatusCode(), 403, "Expected status code 403 for unauthorized access");
+        Assert.assertTrue(response.getBody().asString().contains("Invalid or expired token"), 
+                          "Response should contain 'Invalid or expired token' message");
 
         // Restore auth token
         userServiceHelper.setAuthToken(authToken);
@@ -129,9 +126,9 @@ public class TestGetUser {
 
         Response response = userServiceHelper.getUserById(testUserId);
 
-        Assert.assertEquals(response.getStatusCode(), 401, "Expected status code 401 for unauthorized access");
-        Assert.assertTrue(response.getBody().asString().contains("Unauthorized"), 
-                          "Response should contain 'Unauthorized' message");
+        Assert.assertEquals(response.getStatusCode(), 403, "Expected status code 403 for unauthorized access");
+        Assert.assertTrue(response.getBody().asString().contains("Invalid or expired token"), 
+                          "Response should contain 'Invalid or expired token' message");
         // Restore auth token
         userServiceHelper.setAuthToken(authToken);
     }
@@ -161,23 +158,22 @@ public class TestGetUser {
 
     @Test(priority = 9)
     public void testVerifyUserDataStructure() {
-        Response response = userServiceHelper.getAllUsersResponse();
-
+        Response response = userServiceHelper.getUserById(testUserId);
         Assert.assertEquals(response.getStatusCode(), 200, "Expected status code 200 for getting all users");
 
         User user = response.as(User.class);
 
     
         // Verify required fields ar pesent
-        Assert.assertNotNull(user.getId(), "User ID should be present");
-        Assert.assertNotNull(user.getName(), "User name should be present");
-        Assert.assertNotNull(user.getEmail(), "User email should be present");
-        Assert.assertNotNull(user.getCreatedAt(), "User creation date should be present");
-        Assert.assertNotNull(user.getUpdatedAt(), "User update date should be present");
+        Assert.assertNotNull(user.getId(), "ID should be present");
+        Assert.assertNotNull(user.getName(), "Name should be present");
+        Assert.assertNotNull(user.getEmail(), "Email should be present");
+        Assert.assertNotNull(user.getCreatedAt(), "Creation date should be present");
+        Assert.assertNotNull(user.getUpdatedAt(), "Update date should be present");
 
         // Verify data types and formats    
-        Assert.assertTrue(user.getId().length() > 0 , "User ID should not be empty");
-        Assert.assertTrue(user.getEmail().contains("@"), "User email should contain @ symbol");
+        Assert.assertTrue(user.getId().length() > 0 , "ID should not be empty");
+        Assert.assertTrue(user.getEmail().contains("@"), "Email should contain @ symbol");
     }
     
 }

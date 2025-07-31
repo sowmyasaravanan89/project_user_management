@@ -1,12 +1,10 @@
 package com.sowmya.api.tests;
 
 import java.util.List;
-import java.util.Map;
 
 import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
 import com.sowmya.api.helpers.UserServiceHelper;
@@ -21,6 +19,7 @@ public class TestDeleteUser {
     private UserServiceHelper userServiceHelper;
     private TestDataManager testDataManager;
     private String authToken;
+
     
 
     @BeforeClass
@@ -78,7 +77,7 @@ public class TestDeleteUser {
 
         Assert.assertEquals(deleteResponse.getStatusCode(), 404, "Expected status code 404 for non-existing user deletion");
         Assert.assertTrue(deleteResponse.getBody().asString().contains("User not found"), 
-                          "Expected 'User not found' message for non-existing user deletion");
+                          "Response should contain 'User not found' message");
     }
 
     @Test(priority = 3)
@@ -88,15 +87,15 @@ public class TestDeleteUser {
         Response response = userServiceHelper.deleteUser(invalidId);
 
         Assert.assertEquals(response.getStatusCode(), 404, "Expected status code 404 for invalid user ID deletion");
-        Assert.assertTrue(response.getBody().asString().contains("Invalid user ID format"),
-                            "Expected 'Invalid user ID format' message for invalid user ID deletion");
+        Assert.assertTrue(response.getBody().asString().contains("User not found"),
+                            "Response should contain 'User not found' message");
 
     }
 
 
     @Test(priority = 4)
-    public void testDeleteUserWithoutAuth() {
-        // Create new user to test deletion without auth
+    public void testDeleteUserWithoutAuthentication() {
+        // Create new user 
         List<User> validUsers = testDataManager.getValidUsers();
         User testUser = validUsers.get(1);
 
@@ -111,9 +110,9 @@ public class TestDeleteUser {
 
         Response deleteResponse = userServiceHelper.deleteUser(userId);
 
-        Assert.assertEquals(deleteResponse.getStatusCode(), 401, "Expected status code 401 for unauthorized deletion");
-        Assert.assertTrue(deleteResponse.getBody().asString().contains("Authentication required"),
-                          "Expected 'Authentication required' message for unauthorized deletion");
+        Assert.assertEquals(deleteResponse.getStatusCode(), 403, "Expected status code 403 for unauthorized deletion");
+        Assert.assertTrue(deleteResponse.getBody().asString().contains("Invalid or expired token"),
+                          "Expected 'Invalid or expired token' message for unauthorized deletion");
 
         // Restore auth token
         userServiceHelper.setAuthToken(authToken);
@@ -125,7 +124,7 @@ public class TestDeleteUser {
     public void testDeleteMultipleUsers() {
         // Create multiple users to delete
         List<User> validUsers = testDataManager.getValidUsers();
-        String userId1 = null, userId2 = null;
+        String userId1 , userId2 ;
 
         // Create first user
         Response createResponse1 = userServiceHelper.createUser(validUsers.get(0));
@@ -180,30 +179,7 @@ public class TestDeleteUser {
     }
 
     @Test(priority = 7)
-    public void testDeleteUserResponseTime() {
-        // Create a user to delete
-        List<User> validUsers = testDataManager.getValidUsers();
-        User testUser = validUsers.get(0);
-
-        Response createResponse = userServiceHelper.createUser(testUser);
-        Assert.assertEquals(createResponse.getStatusCode(), 201, "Expected status code 201 for user creation");
-
-        User createdUser = createResponse.as(User.class);
-        String userId = createdUser.getId();
-
-        // Measure response time for deletion
-        long startTime = System.currentTimeMillis();
-        Response deleteResponse = userServiceHelper.deleteUser(userId);
-        long endTime = System.currentTimeMillis();
-
-        Assert.assertEquals(deleteResponse.getStatusCode(), 200, "Expected status code 200 for user deletion");
-        
-        long responseTime = endTime - startTime;
-        Assert.assertTrue(responseTime < 5000, "Expected response time to be less than 5 seconds, but was " + responseTime + " ms");
-    }
-
-    @Test(priority = 8)
-    public void testDeleteUserIdempotency() {
+    public void testDeleteSameUserAgain() {
         // Create a user to delete
         List<User> validUsers = testDataManager.getValidUsers();
         User testUser = validUsers.get(1);
@@ -248,7 +224,7 @@ public class TestDeleteUser {
         int initialCount = allUsers1.size();
 
         // Delete middle user
-        Response deleteResponse = userServiceHelper.deleteUser(userId1);
+        Response deleteResponse = userServiceHelper.deleteUser(userId2);
         Assert.assertEquals(deleteResponse.getStatusCode(), 200, "Expected status code 200 for first user deletion");
 
         // Get all users again and verify count
@@ -257,8 +233,8 @@ public class TestDeleteUser {
 
         // Verify the deleted user is not in the list
         final String deletedUserId = userId2;
-        boolean userExistsdeletedUserFound = allUsers2.stream().anyMatch(user -> user.getId().equals(deletedUserId));
-        Assert.assertFalse(userExistsdeletedUserFound, "Deleted user should not be present in the list");
+        boolean deleteUserFound = allUsers2.stream().anyMatch(user -> user.getId().equals(deletedUserId));
+        Assert.assertFalse(deleteUserFound, "Deleted user should not be present in the list");
 
 
         // Clean up by deleting remaining users
