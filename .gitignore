@@ -6,6 +6,7 @@ backend/data/users.json
 backend/data/auth.json
 frontend/node_modules
 allure-results
+screenshots
 /.pnp
 .pnp.js
 

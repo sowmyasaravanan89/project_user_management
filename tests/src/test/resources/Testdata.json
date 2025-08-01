@@ -1,0 +1,124 @@
+{
+    "validUsers":[
+        {
+            "name": "Sam Doe", 
+            "email": "sam.doe@ork.com",
+            "age" : 34
+        },
+        {
+            "name": "Shane Smith", 
+            "email": "shane.smith@ork.com",
+            "age" : 27
+        },
+        {
+            "name": "Bob Johnson", 
+            "email": "bob.johnson@ork.com",
+            "age" : 39
+        },
+        {
+            "name": "Ned Johnson", 
+            "email": "ned.johnson@pep.com",
+            "age" : 44
+        },
+        {
+            "name": "Ella Brown", 
+            "email": "ella.brown@pep.com",
+            "age" : 29
+        },
+        {
+            "name": "Alice Wilson", 
+            "email": "alice.wilson@sign.com",
+            "age" : 32
+        }
+
+    ],
+    "invalidUsers":[
+        {
+            "name": "", 
+            "email": "invalid@test.com",
+            "age" : 22
+        },
+        {
+            "name": "Test User", 
+            "email": "",
+            "age" : 30
+        },
+        {
+            "name": "Test User", 
+            "email": "not-an-email",
+            "age" : 30
+        },
+        { 
+            "email": "missing.name@test.com",
+            "age" : 25
+        },
+        {
+            "name": "Missing email user",
+            "age" : 31
+        },
+        {
+            "name": null, 
+            "email": "null.name@test.com",
+            "age" : 22
+        },
+        {
+            "name": "Null email User", 
+            "email": null,
+            "age" : 44
+        }
+    ],
+    "updateUserData":[
+        {
+            "name": "Michael Doe Updated", 
+            "email": "michael.doe.updated@test.com",
+            "age" : 32
+        },
+        {
+            "name": "Jane Smith Updated", 
+            "email": "jane.smith.updated@test.com",
+            "age" : 24
+        },
+        {
+            "name": "Bob Johnson Updated", 
+            "email": "bob.johnson.updated@test.com",
+            "age" : 35
+        },
+        {
+            "name": "Alice Wilson Updated", 
+            "email": "alice.wilson.updated@test.com",
+            "age" : 23
+        },
+        {
+            "name": "Charlie Brown Updated", 
+            "email": "charlie.brown.updated@test.com",
+            "age" : 50
+        }
+    ],
+    "patchUserData":[
+        {
+            "name":"Michael Doe Patched"
+        },
+        {
+            "email": "michael.doe.patched@test.com"
+        },
+        {
+            "age": 42
+        }
+    ],
+    "authData":{
+        "validCredentials": {
+            "username": "admin",
+            "password": "password123"
+        },
+        "invalidCredentials":[
+            {
+                "username": "wronguser",
+                "password": "wrongpass"
+            },
+            {
+                "username": "admin",
+                "password": "wrongpass"
+            }
+        ]
+    }
+}
