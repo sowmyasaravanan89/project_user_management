@@ -17,6 +17,7 @@ import com.microsoft.playwright.BrowserType;
 import com.microsoft.playwright.Locator;
 import com.microsoft.playwright.Page;
 import com.microsoft.playwright.Playwright;
+import com.microsoft.playwright.options.AriaRole;
 import com.sowmya.api.utils.ConfigManager;
 
 public class E2ETest {
@@ -115,9 +116,10 @@ public class E2ETest {
 
     private void performLogin(String username, String password) {
         try {
-            page.locator("input[placeholder*='username'], input[type='text']").first().fill(username);
-            page.locator("input[type='password']").fill(password);
-            page.locator("button:has-text('Sign In')").first().click();
+            page.getByPlaceholder("Enter your username").first().fill(username);
+            page.getByPlaceholder("Enter your password").fill(password);
+            page.screenshot(new Page.ScreenshotOptions().setPath(Paths.get("loginFill.png")));
+            page.getByRole(AriaRole.BUTTON, new Page.GetByRoleOptions().setName("Sign In")).first().click();
         } catch (Exception e) {
             System.out.println("Error during login:" + e.getMessage());
         }
@@ -127,10 +129,15 @@ public class E2ETest {
         try {
             page.waitForLoadState();
 
-            boolean hasWelcome = page.locator("text=Welcome").isVisible();
-            boolean hasUserManagement = page.locator("text=User Management").isVisible();
-            boolean hasAddButton = page.locator("button:has-text('Add')").isVisible();
-            boolean hasLogoutButton = page.locator("button:has-text('Logout')").isVisible();
+            boolean hasWelcome = page.getByText("Welcome, admin").isVisible();
+            boolean hasUserManagement = page.getByText("User Management").isVisible();
+            page.screenshot(new Page.ScreenshotOptions().setPath(Paths.get("welcomenote.png")));
+            boolean hasAddButton =page.getByRole(AriaRole.BUTTON,
+                 new Page.GetByRoleOptions().setName("Add User")).first()
+                 .isVisible();
+            boolean hasLogoutButton = page.getByRole(AriaRole.BUTTON,
+                 new Page.GetByRoleOptions().setName("Logout")).first()
+                 .isVisible();
 
             boolean isLoggedIn = (hasWelcome || hasUserManagement || hasAddButton || hasLogoutButton);
 
