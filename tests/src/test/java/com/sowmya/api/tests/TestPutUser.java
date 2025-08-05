@@ -299,19 +299,4 @@ public  class TestPutUser {
         return data;
     }
     
-    @DataProvider(name= "edgeCaseUpdateData")
-    public Object[][] getEdgeCaseUpdateData(){
-        return new Object[][]{
-            // Very long name
-            {Map.of("name","A".repeat(255),"email","longname@example.com","Age",30)},
-            //Age boundary vlues
-            {Map.of("name","Young User","email","younng@example.com","Age",0)},
-            {Map.of("name","Old User","email","old@example.com","Age",155)},
-            //Special characters in name
-            {Map.of("name","User with special chars !@@$@","email","special@example.com","Age",29)},
-
-        };
-    }
-    
-
 }

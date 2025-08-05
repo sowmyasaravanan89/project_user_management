@@ -12,6 +12,35 @@ const AUTH_FILE = path.join(__dirname, 'data', 'auth.json');
 app.use(cors());
 app.use(express.json());
 
+// Email validation function
+const isValidEmail = (email) => {
+  // Check if email contains @ symbol
+  if (!email || typeof email !== 'string' || !email.includes('@')) {
+    return false;
+  }
+  
+  // Basic email format validation
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  return emailRegex.test(email);
+};
+
+// Age validation function
+const isValidAge = (age) => {
+  // Age is optional, so undefined is allowed
+  if (age === undefined) {
+    return true;
+  }
+  
+  // Don't allow null, empty string, or non-numeric values
+  if (age === null || age === '' || isNaN(age)) {
+    return false;
+  }
+  
+  // Convert to number and check if it's a positive integer
+  const numAge = Number(age);
+  return Number.isInteger(numAge) && numAge >= 0 && numAge <= 150;
+};
+
 // Ensure data directory exists
 const ensureDataDir = async () => {
   const dataDir = path.dirname(DATA_FILE);
@@ -210,6 +239,16 @@ app.post('/api/users', authenticateToken, async (req, res) => {
       return res.status(400).json({ error: 'Name and email are required' });
     }
     
+    // Email validation - check for @ symbol and proper format
+    if (!isValidEmail(email)) {
+      return res.status(400).json({ error: 'Email must contain @ symbol and be in valid format' });
+    }
+    
+    // Age validation - optional but must be valid if provided
+    if (!isValidAge(age)) {
+      return res.status(400).json({ error: 'Age must be a valid number between 0 and 150, or omitted entirely' });
+    }
+    
     const users = await readData();
     
     // Check if email already exists
@@ -222,7 +261,7 @@ app.post('/api/users', authenticateToken, async (req, res) => {
       id: generateId(),
       name,
       email,
-      age: age || null,
+      age: age === undefined ? undefined : Number(age),
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString()
     };
@@ -252,6 +291,16 @@ app.put('/api/users/:id', authenticateToken, async (req, res) => {
       return res.status(400).json({ error: 'Name and email are required' });
     }
     
+    // Email validation - check for @ symbol and proper format
+    if (!isValidEmail(email)) {
+      return res.status(400).json({ error: 'Email must contain @ symbol and be in valid format' });
+    }
+    
+    // Age validation - optional but must be valid if provided
+    if (!isValidAge(age)) {
+      return res.status(400).json({ error: 'Age must be a valid number between 0 and 150, or omitted entirely' });
+    }
+    
     // Check if email already exists (excluding current user)
     const existingUser = users.find(u => u.email === email && u.id !== req.params.id);
     if (existingUser) {
@@ -262,7 +311,7 @@ app.put('/api/users/:id', authenticateToken, async (req, res) => {
       ...users[userIndex],
       name,
       email,
-      age: age || null,
+      age: age === undefined ? undefined : Number(age),
       updatedAt: new Date().toISOString()
     };
     
