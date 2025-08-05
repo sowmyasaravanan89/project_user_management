@@ -104,7 +104,7 @@ public class E2ETest {
         testAddUserFlow();
 
         // // step 5: Edit user
-        // testEditUserFlow();
+         testEditUserFlow();
 
         // // step 6: Delete user
         testDeleteUserFlow();
@@ -231,6 +231,7 @@ public class E2ETest {
                 if(nameField.isVisible()) {
                     String originalvalue = nameField.inputValue();
                     nameField.fill(originalvalue + "updated");
+                    page.screenshot(new Page.ScreenshotOptions().setPath(Paths.get("EditUser.png")));
 
                     Locator saveButton = page.locator("button:has-text('Update')").first();
                     if (saveButton.isVisible()) {
@@ -253,6 +254,7 @@ public class E2ETest {
             diaglog.accept();
         });
         page.getByTitle("Delete").first().click();
+        page.screenshot(new Page.ScreenshotOptions().setPath(Paths.get("DeleteUser.png")));
         // FIXME: find a way to make pop up confirmation work inside try catch
         // try {
         //     Locator deleteButton = page.getByTitle("Delete").first();
