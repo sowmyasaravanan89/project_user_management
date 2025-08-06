@@ -82,7 +82,7 @@ public class E2ETest {
         }
     }
 
-    @Test(description = "E2E test: Login -> Add User -> Edit User -> Delete User -> Logout")
+    @Test(priority =1, description = "E2E test: Login -> Add User -> Edit User -> Delete User -> Logout")
     public void testCompleteUserFlow() {
         // step 1: login 
         boolean onLoginPage = page.locator("input[type='password']").isVisible();
@@ -111,6 +111,21 @@ public class E2ETest {
 
         // // step 7: Logout
         testLogoutFlow();
+    }
+
+    @Test(priority =2 , description  = "Test all negative sceanrios")
+    public void testNegativeScenarios(){
+
+        testEmptyName();
+
+        testEmptyEmail();
+
+        testInvalidEmailId();
+
+        testWithoutAge();
+
+        testAgeWithNegativeValue();
+
     }
 
 
@@ -217,6 +232,34 @@ public class E2ETest {
         }
     }
 
+    private boolean fillAddUserForm(String username, String email) {
+        try {
+            boolean isUsernameFilled = false;
+            boolean isEmailFilled = false;
+
+            // Try to fill username
+            Locator usernameField = page.locator("input[placeholder*='name']").first();
+            if (usernameField.isVisible()) {
+                usernameField.fill(username);
+                isUsernameFilled = true;
+            }
+
+            // Try to fill email
+            Locator emailField = page.locator("input[placeholder*='email']").first();
+            if (emailField.isVisible()) {
+                emailField.fill(email);
+                isEmailFilled = true;
+            }
+
+            boolean allFieldsFilled = (isUsernameFilled && isEmailFilled);
+
+            return allFieldsFilled;
+        } catch (Exception e) {
+            System.out.println("Error when trying to fill user details:" + e.getMessage());
+            return false;
+        }
+    }
+
     private void testEditUserFlow() {
         try {
             // Locator editButton = page.locator("button:has-text('Edit'), [title='Edit'], .edit-btn").first();
@@ -292,6 +335,136 @@ public class E2ETest {
         } catch (Exception e) {
             System.out.println("Error when trying to logout:" + e.getMessage());
         }
+    }
+
+    public void testInvalidEmailId(){
+
+        performLogin("admin", "password123");
+
+        Locator addButton = page.getByRole(
+                AriaRole.BUTTON, new Page.GetByRoleOptions().setName("Add User")
+            );
+        page.waitForLoadState();
+        addButton.click();
+        Assert.assertTrue(page.getByText("Add New User").isVisible());
+        fillAddUserForm("sowmya", "sowmyaabc.com", "30");
+        Locator createButton = page.getByRole(
+                AriaRole.BUTTON, new Page.GetByRoleOptions().setName("Create")
+            );
+        createButton.click();
+        Locator invalidEmailIdErrorText = page.getByText(
+            " Email must contain @ symbol and be in valid format"
+            );
+        Assert.assertTrue(invalidEmailIdErrorText.isVisible());    
+        page.screenshot(new Page.ScreenshotOptions().
+            setPath(Paths.get("Invalid_email_error.png")));
+
+       testLogoutFlow();
+
+    }
+
+    public void testWithoutAge(){
+
+        performLogin("admin", "password123");
+
+        Locator addButton = page.getByRole(
+                AriaRole.BUTTON, new Page.GetByRoleOptions().setName("Add User")
+            );
+        page.waitForLoadState();
+        addButton.click();
+        Assert.assertTrue(page.getByText("Add New User").isVisible());
+        fillAddUserForm("test","test@yuy.com");
+        Locator createButton = page.getByRole(
+                AriaRole.BUTTON, new Page.GetByRoleOptions().setName("Create")
+            );
+        createButton.click();
+        Locator invalidAgeErrorText = page.getByText(
+            " Age must be a valid number between 0 and 150, or omitted entirely"
+            );
+        Assert.assertTrue(invalidAgeErrorText.isVisible());    
+        page.screenshot(new Page.ScreenshotOptions().
+            setPath(Paths.get("Invalid_age_error.png")));
+
+       testLogoutFlow();
+
+    }
+
+    public void testEmptyName(){
+
+        performLogin("admin", "password123");
+
+        Locator addButton = page.getByRole(
+                AriaRole.BUTTON, new Page.GetByRoleOptions().setName("Add User")
+            );
+        page.waitForLoadState();
+        addButton.click();
+        Assert.assertTrue(page.getByText("Add New User").isVisible());
+        fillAddUserForm("","test@yuy.com","23");
+        Locator createButton = page.getByRole(
+                AriaRole.BUTTON, new Page.GetByRoleOptions().setName("Create")
+            );
+        createButton.click();
+        Locator emptyNameErrorText = page.getByText(
+            "Name and email are required"
+            );
+        Assert.assertTrue(emptyNameErrorText.isVisible());    
+        page.screenshot(new Page.ScreenshotOptions().
+            setPath(Paths.get("Without_Name_error.png")));
+
+       testLogoutFlow();
+
+    }
+
+    public void testEmptyEmail(){
+
+        performLogin("admin", "password123");
+
+        Locator addButton = page.getByRole(
+                AriaRole.BUTTON, new Page.GetByRoleOptions().setName("Add User")
+            );
+        page.waitForLoadState();
+        addButton.click();
+        Assert.assertTrue(page.getByText("Add New User").isVisible());
+        fillAddUserForm("hello","","23");
+        Locator createButton = page.getByRole(
+                AriaRole.BUTTON, new Page.GetByRoleOptions().setName("Create")
+            );
+        createButton.click();
+        Locator emptyEmailErrorText = page.getByText(
+            "Name and email are required"
+            );
+        Assert.assertTrue(emptyEmailErrorText.isVisible());    
+        page.screenshot(new Page.ScreenshotOptions().
+            setPath(Paths.get("Without_email_error.png")));
+
+       testLogoutFlow();
+
+    }
+
+    public void testAgeWithNegativeValue(){
+
+        performLogin("admin", "password123");
+
+        Locator addButton = page.getByRole(
+                AriaRole.BUTTON, new Page.GetByRoleOptions().setName("Add User")
+            );
+        page.waitForLoadState();
+        addButton.click();
+        Assert.assertTrue(page.getByText("Add New User").isVisible());
+        fillAddUserForm("test","test@yuy.com","-26");
+        Locator createButton = page.getByRole(
+                AriaRole.BUTTON, new Page.GetByRoleOptions().setName("Create")
+            );
+        createButton.click();
+        Locator negativeAgeError = page.getByText(
+            " Age must be a valid number between 0 and 150, or omitted entirely"
+            );
+        Assert.assertTrue(negativeAgeError.isVisible());    
+        page.screenshot(new Page.ScreenshotOptions().
+            setPath(Paths.get("Negative_age_error.png")));
+
+       testLogoutFlow();
+
     }
 
     protected void takeScreenshot(String name) {
