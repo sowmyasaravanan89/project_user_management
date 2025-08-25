@@ -48,7 +48,8 @@ public class TestPostUser {
 
         Response response = userServiceHelper.createUser(testUser);
 
-        Assert.assertEquals(response.getStatusCode(), 201, "Expected status code 201 for user creation");
+        Assert.assertEquals(response.getStatusCode(), 201, 
+            "Expected status code 201 for user creation");
 
         // Verify response body
         User createdUser = response.as(User.class);
@@ -60,15 +61,15 @@ public class TestPostUser {
 
         // Clean up - delete the created user
 
-        userServiceHelper.deleteUser(createdUser.getId());
-        
+      userServiceHelper.deleteUser(createdUser.getId());     
      } 
 
     @Test(priority = 2, dataProvider = "validUserData")
     public void testCreateMultipleValidUsers(User user) {
         Response response = userServiceHelper.createUser(user);
 
-        Assert.assertEquals(response.getStatusCode(), 201, "Expected status code 201 for user creation");
+        Assert.assertEquals(response.getStatusCode(), 201, 
+            "Expected status code 201 for user creation");
 
         User createdUser = response.as(User.class);
         Assert.assertNotNull(createdUser.getId(), "User ID should not be null");
@@ -84,8 +85,10 @@ public class TestPostUser {
     public void testCreateInvalidUser(Map<String, Object> userData) {
         Response response = userServiceHelper.createUser(userData);
 
-        Assert.assertEquals(response.getStatusCode(), 400, "Expected status code 400 for invalid user creation");
-        Assert.assertTrue(response.getBody().asString().contains("error"), "Response should contain error message for invalid data");
+        Assert.assertEquals(response.getStatusCode(), 400, 
+            "Expected status code 400 for invalid user creation");
+        Assert.assertTrue(response.getBody().asString().contains("error"), 
+            "Response should contain error message for invalid data");
     }
 
     @Test(priority = 4)
@@ -95,13 +98,15 @@ public class TestPostUser {
         User testUser = validUsers.get(0);
 
         Response firstResponse = userServiceHelper.createUser(testUser);
-        Assert.assertEquals(firstResponse.getStatusCode(), 201, "Expected status code 201 for first user creation");
+        Assert.assertEquals(firstResponse.getStatusCode(), 201, 
+            "Expected status code 201 for first user creation");
 
         User createdUser = firstResponse.as(User.class);
 
         // Try to create second user with same email
         Response secondResponse = userServiceHelper.createUser(testUser);
-        Assert.assertEquals(secondResponse.getStatusCode(), 400, "Expected status code 400 for duplicate email");
+        Assert.assertEquals(secondResponse.getStatusCode(), 400, 
+            "Expected status code 400 for duplicate email");
         Assert.assertTrue(secondResponse.getBody().asString().contains("Email already exists"), 
                             "Response should contain error message for duplicate email");
         // Clean up
@@ -120,7 +125,8 @@ public class TestPostUser {
 
         Response response = userServiceHelper.createUser(testUser);
         
-        Assert.assertEquals(response.getStatusCode(), 403, "Expected status code 403 for unauthenticated request");
+        Assert.assertEquals(response.getStatusCode(), 403,
+             "Expected status code 403 for unauthenticated request");
         Assert.assertTrue(response.getBody().asString().contains("Invalid or expired token"), 
                             "Response should contain authentication error message");
 
@@ -136,7 +142,8 @@ public class TestPostUser {
             "age",25
         );
         Response response1 = userServiceHelper.createUser(userWithoutName);
-        Assert.assertEquals(response1.getStatusCode(), 400, "Expected status code 400 for missing name");
+        Assert.assertEquals(response1.getStatusCode(), 400, 
+            "Expected status code 400 for missing name");
 
         // Test with missing email
         Map<String, Object> userWithoutEmail = Map.of(
@@ -144,7 +151,8 @@ public class TestPostUser {
             "age", 25
         );
         Response response2 = userServiceHelper.createUser(userWithoutEmail);
-        Assert.assertEquals(response2.getStatusCode(), 400, "Expected status code 400 for missing email");        
+        Assert.assertEquals(response2.getStatusCode(), 400,
+             "Expected status code 400 for missing email");        
     }
 
     @Test(priority = 7)
@@ -164,6 +172,37 @@ public class TestPostUser {
         // Clean up
         userServiceHelper.deleteUser(createdUser.getId());
     }
+
+    @Test(priority = 10)
+    public void testCreateUserWithInvalidEmail() {
+        Map<String, Object> userWithoutValidEmail = Map.of(
+            "name", "Invalid Email Test",
+            "email", "email.com",
+            "age", 25
+        );
+
+        Response response = userServiceHelper.createUser(userWithoutValidEmail);
+        Assert.assertEquals(response.getStatusCode(), 400, 
+            "Expected status code 400 for invalid email");
+        Assert.assertTrue(response.getBody().asString().contains("Email must contain @ symbol and be in valid format"), 
+            "Expected email validation error message for InvalidEmail");
+    }
+
+    @Test(priority = 11)
+    public void testCreateUserWithInvalidAge() {
+        Map<String, Object> userWithInvalidAge = Map.of(
+            "name", "Invalid Age Test",
+            "email", "Test@org.com",
+            "age", ""
+        );
+
+        Response response = userServiceHelper.createUser(userWithInvalidAge);
+        Assert.assertEquals(response.getStatusCode(), 400, 
+            "Expected status code 400 for invalid age");
+        Assert.assertTrue(response.getBody().asString().contains("Age must be a valid number between 0 and 150, or omitted entirely"), 
+            "Expected age validation error message");
+    }
+
 
     @DataProvider(name = "validUserData")
     public Object[][] getValidUserData() {

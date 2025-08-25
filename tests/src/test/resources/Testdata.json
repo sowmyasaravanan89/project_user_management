@@ -43,11 +43,6 @@
             "email": "",
             "age" : 30
         },
-        {
-            "name": "Test User", 
-            "email": "not-an-email",
-            "age" : 30
-        },
         { 
             "email": "missing.name@test.com",
             "age" : 25

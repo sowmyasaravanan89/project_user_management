@@ -23,7 +23,7 @@ public class UserServiceHelper {
     
      private static final String BASE_URL =  ConfigManager.getInstance().geString(("base_url"));
      private static final String PORT = ConfigManager.getInstance().geString("backend_port");
-     private static String authToken = null;
+     private static String authToken ;
 
     public UserServiceHelper(){
          RestAssured.baseURI = BASE_URL;

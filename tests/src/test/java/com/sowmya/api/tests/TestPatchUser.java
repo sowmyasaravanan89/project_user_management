@@ -146,6 +146,7 @@ public class TestPatchUser {
         );
         Response response2 = userServiceHelper.updateUser(testUserId, dataWithoutEmail);
         Assert.assertEquals(response2.getStatusCode(), 400, "Should fail when email is missing"); 
+
     }
 
     @Test(priority = 5)
