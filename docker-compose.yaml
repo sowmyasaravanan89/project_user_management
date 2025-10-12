@@ -1,20 +1,16 @@
-version: "3.8"
-
 services:
   backend:
     build:
-      context: ./backend
+      context: .
       dockerfile: backend.Dockerfile
     ports:
       - "5000:5000"
 
   frontend:
     build:
-      context: ./frontend
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: frontend.Dockerfile
     ports:
       - "80:80"
-    environment:
-      REACT_APP_API_URL: http://backend:5000
     depends_on:
       - backend
